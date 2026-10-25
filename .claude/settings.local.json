@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(echo \"tsc exit: $?\")",
+      "Bash(npx esbuild *)",
+      "Bash(echo \"esbuild exit: $?\")",
+      "Bash(npm i *)",
+      "Bash(grep -v '^\\\\s*$')",
+      "Bash(grep -rnhoE \"\\(localhost:8000|API_URL|API_BASE\\)[^'\\\\\"\\\\` ]*/api/[a-z/_-]*\" frontend/src)",
+      "Bash(npm -v)",
+      "Bash(grep -E \"api/|headers|Authorization|\\\\\\\\$\\\\{\")",
+      "Bash(rm -rf dist src/infrastructure src/domain src/application)",
+      "Bash(npm install *)",
+      "Bash(sed -i \"s/filename: info.filename, content/filename: info.filename ?? '', content/\" src/infrastructure/http/body.ts)",
+      "Bash(node -e ' *)",
+      "Bash(curl -s localhost:8000/api/equipos/)",
+      "Bash(curl -s -X POST localhost:8123/api/unirse-equipo/ -H 'Content-Type: application/json' -d '{\"codigo_equipo\":\"1234561\",\"nombre\":\"Juan\",\"apellido\":\"Pérez\",\"correo\":\"juan@x.com\"}')",
+      "Bash(curl -s -X POST localhost:8123/api/unirse-equipo/ -H 'Content-Type: application/json' -d '{\"codigo_equipo\":\"1234561\",\"nombre\":\"Maria\",\"apellido\":\"Lopez\"}')",
+      "Bash(curl -s -X POST localhost:8123/api/unirse-equipo/ -H 'Content-Type: application/json' -d '{\"codigo_equipo\":\"9999999\",\"nombre\":\"A\",\"apellido\":\"B\"}')",
+      "Bash(curl -s -X POST localhost:8123/api/partida/1/iniciar-juego/)",
+      "Bash(grep -iE \"\\\\.env|credential|\\\\.json$|\\\\.pem|key\")",
+      "Bash(python3 -c \"import json;d=json.load\\(open\\('backend/misionemprende/gcs-credentials.json'\\)\\);print\\({k:\\('<oculto>' if k in\\('private_key','private_key_id'\\) else d[k]\\) for k in \\('type','project_id','client_email','private_key'\\)}\\)\")"
+    ]
+  }
+}
