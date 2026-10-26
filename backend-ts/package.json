@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit -p .",
     "dev": "tsx watch src/main/server.ts",
     "start": "tsx src/main/server.ts",
-    "build": "esbuild src/main/lambda.ts --bundle --platform=node --target=node20 --outfile=dist/lambda.js"
+    "build": "esbuild src/main/lambda.ts --bundle --platform=node --target=node22 --outfile=dist/lambda.js"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +30,8 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1156.0",
+    "@aws-sdk/lib-dynamodb": "^3.1156.0",
     "@google-cloud/storage": "^8.4.0",
     "busboy": "^1.6.0",
     "cors": "^2.8.6",

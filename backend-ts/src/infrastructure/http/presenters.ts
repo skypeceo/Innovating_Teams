@@ -32,6 +32,9 @@ export const estudianteDetailJson = ({ estudiante, usuario, listaParticipante }:
 
 export const equipoJson = (e: Equipo) => ({ id: e.id, tamanoequipo: e.tamanoEquipo, nombre: e.nombreEquipo });
 
+/** v2 (canario): agrega el código del equipo; es compatible con los clientes de la v1. */
+export const equipoV2Json = (e: Equipo) => ({ ...equipoJson(e), codigo_equipo: e.codigoEquipo });
+
 export const partidaJson = (p: Partida) => ({
   id: p.id,
   estado: p.estado,

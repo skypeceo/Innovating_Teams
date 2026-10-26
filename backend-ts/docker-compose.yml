@@ -1,0 +1,6 @@
+# DynamoDB Local para la demo sin AWS: `docker compose up -d` y luego npm run dev con DYNAMODB_TABLE/DYNAMODB_ENDPOINT.
+services:
+  dynamodb:
+    image: amazon/dynamodb-local
+    ports:
+      - "8001:8000"

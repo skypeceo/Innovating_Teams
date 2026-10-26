@@ -1,8 +1,10 @@
-import { PasswordHasher } from '../../../application/ports/services';
-import { Repositories } from '../../../main/container';
+import { PasswordHasher } from '../../application/ports/services';
+import { Repositories } from '../../main/container';
 
 /** Datos mínimos para desarrollo local; las contraseñas se pueden sobrescribir por entorno. */
 export const seedDevelopmentData = async (repos: Repositories, hasher: PasswordHasher): Promise<void> => {
+  // Idempotente: con DynamoDB cada cold start de Lambda vuelve a llamar al seed.
+  if (await repos.usuarios.findByEmail('admin@demo.com')) return;
   const now = new Date();
   const passwordFor = (envName: string, fallback: string) => process.env[envName] ?? fallback;
 

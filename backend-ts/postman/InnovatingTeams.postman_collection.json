@@ -1,0 +1,1758 @@
+{
+  "info": {
+    "name": "Innovating Teams API",
+    "description": "Todos los endpoints del backend-ts. Levantar con `npm run dev` (http://localhost:8000/api) o cambiar {{baseUrl}} por la URL de API Gateway.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "partidaId",
+      "value": "1"
+    },
+    {
+      "key": "codigoPartida",
+      "value": "123456"
+    },
+    {
+      "key": "codigoEquipo",
+      "value": "1234561"
+    },
+    {
+      "key": "temaId",
+      "value": "1"
+    },
+    {
+      "key": "desafioId",
+      "value": "1"
+    },
+    {
+      "key": "usuarioId",
+      "value": "1"
+    },
+    {
+      "key": "estudianteId",
+      "value": "1"
+    },
+    {
+      "key": "cursoId",
+      "value": "1"
+    },
+    {
+      "key": "videoId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Sistema",
+      "description": "Lista de endpoints generada desde el router.",
+      "item": [
+        {
+          "name": "Listar endpoints",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/endpoints/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "endpoints",
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Auth",
+      "description": "Login. \"Login admin\" guarda el token en {{token}} para la carpeta Admin.",
+      "item": [
+        {
+          "name": "Login admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('token', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login/admin/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login",
+                "admin",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@demo.com\",\n  \"password\": \"admin-demo-123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login profesor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login/profesor/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login",
+                "profesor",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"profesor@demo.com\",\n  \"password\": \"profesor-demo-123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login estándar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/login/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "login",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@demo.com\",\n  \"password\": \"admin-demo-123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Partida (flujo profesor → estudiantes)",
+      "description": "Ejecutar en orden: cada request guarda variables para la siguiente.",
+      "item": [
+        {
+          "name": "Crear partida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('partidaId', pm.response.json().id); pm.collectionVariables.set('codigoPartida', pm.response.json().codigoAcceso);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/crear-partida/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "crear-partida",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"max_equipos\": 2,\n  \"max_participantes\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Validar código de partida",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/validar-codigo/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "validar-codigo",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{codigoPartida}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Asignar grupos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('codigoEquipo', pm.response.json().grupos_creados[0].codigo_equipo);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/partida/{{partidaId}}/asignar-grupos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partida",
+                "{{partidaId}}",
+                "asignar-grupos",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grupos\": [\n    {\n      \"nombre\": \"Los Pioneros\",\n      \"alumnos\": [\n        {\n          \"id_correo_usuario\": \"ana@demo.com\",\n          \"primer_nombre\": \"Ana\",\n          \"apellido_paterno\": \"Paz\",\n          \"apellido_materno\": \"Rey\"\n        }\n      ]\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Validar código de equipo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/validar-equipo/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "validar-equipo",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{codigoEquipo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Unirse a equipo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/unirse-equipo/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "unirse-equipo",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo_equipo\": \"{{codigoEquipo}}\",\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Pérez\",\n  \"correo\": \"juan@demo.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Obtener grupos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/partida/{{partidaId}}/obtener-grupos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partida",
+                "{{partidaId}}",
+                "obtener-grupos",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Iniciar juego",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/partida/{{partidaId}}/iniciar-juego/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partida",
+                "{{partidaId}}",
+                "iniciar-juego",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Estado actual",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/partida/{{partidaId}}/estado-actual/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "partida",
+                "{{partidaId}}",
+                "estado-actual",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Asignar grupos desde CSV",
+          "request": {
+            "method": "POST",
+            "description": "En Body > form-data, elegir el archivo postman/lista_ejemplo.csv en \"archivo_lista\".",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/groups/assign/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "groups",
+                "assign",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo_lista",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "cantidad_grupos",
+                  "value": "2",
+                  "type": "text"
+                },
+                {
+                  "key": "tiene_encabezado",
+                  "value": "true",
+                  "type": "text"
+                },
+                {
+                  "key": "modo",
+                  "value": "aleatoria",
+                  "type": "text"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Equipos y estudiantes (canario)",
+      "description": "GET /equipos tiene canario: X-Canary fuerza la versión y la respuesta indica cuál atendió en el header X-Version.",
+      "item": [
+        {
+          "name": "Equipos (aleatorio según CANARY_PERCENT)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/equipos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "equipos",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Equipos v1 estable (X-Canary: false)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Canary",
+                "value": "false"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/equipos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "equipos",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Equipos v2 canario (X-Canary: true)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Canary",
+                "value": "true"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/equipos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "equipos",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Estudiantes por equipo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/equipos/1/estudiantes/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "equipos",
+                "1",
+                "estudiantes",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Carga masiva de estudiantes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/bulk_create/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "bulk_create",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estudiantes\": [\n    {\n      \"correo\": \"beto@demo.com\",\n      \"nombre\": \"Beto\",\n      \"apellido_paterno\": \"Gil\",\n      \"apellido_materno\": \"Soto\",\n      \"rut\": \"11111111-1\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Soluciones y almacenamiento",
+      "description": "signed-url requiere GCS_BUCKET_NAME y GCS_CREDENTIALS_FILE; sin ellos responde 500 con el motivo.",
+      "item": [
+        {
+          "name": "Guardar imagen de solución",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/guardar-imagen/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "guardar-imagen",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"equipo_id\": 1,\n  \"image_url\": \"https://storage.googleapis.com/demo/equipo1.png\",\n  \"descripcion\": \"Prototipo LEGO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Obtener imagen de equipo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/obtener-imagen/?team_id=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "obtener-imagen",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "team_id",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "URL firmada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/signed-url/?grupoId=1&ext=png",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "signed-url",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "grupoId",
+                  "value": "1"
+                },
+                {
+                  "key": "ext",
+                  "value": "png"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "URL firmada (ruta storage)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/storage/signed-url/?grupoId=1&ext=png",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "storage",
+                "signed-url",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "grupoId",
+                  "value": "1"
+                },
+                {
+                  "key": "ext",
+                  "value": "png"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Admin (requiere token)",
+      "description": "Ejecutar antes \"1. Auth > Login admin\". Sin token responde 401; con token de profesor, 403.",
+      "item": [
+        {
+          "name": "Listar temas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/temas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "temas",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar temas SIN token (401)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/temas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "temas",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear tema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('temaId', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/temas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "temas",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombretema\": \"Salud\",\n  \"descripcion\": \"Bienestar en la comunidad\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Obtener tema",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/temas/{{temaId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "temas",
+                "{{temaId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar tema",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/temas/{{temaId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "temas",
+                "{{temaId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombretema\": \"Salud y bienestar\",\n  \"descripcion\": \"Bienestar físico y mental\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar tema (baja lógica)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/temas/{{temaId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "temas",
+                "{{temaId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar desafíos (paginado)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/desafios/?page=1&limit=10&search=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "desafios",
+                ""
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear desafío",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('desafioId', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/desafios/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "desafios",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Movilidad segura\",\n  \"descripcion\": \"Diseña una solución para cruzar la calle\",\n  \"tema_desafio_id\": 1,\n  \"persona_id\": 1,\n  \"nombrepersona\": \"Arquetipo 1\",\n  \"edadpersona\": 67,\n  \"contexto\": \"Adulto mayor\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Obtener desafío",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/desafios/{{desafioId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "desafios",
+                "{{desafioId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar desafío",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/desafios/{{desafioId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "desafios",
+                "{{desafioId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Movilidad segura v2\",\n  \"descripcion\": \"Cruces peatonales accesibles\",\n  \"tema_desafio_id\": 1,\n  \"persona_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar desafío (baja lógica)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/desafios/{{desafioId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "desafios",
+                "{{desafioId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar personas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/personas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "personas",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear persona",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Token {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/personas/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "personas",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Don Pedro\",\n  \"imagenurl\": \"\",\n  \"contexto\": \"Adulto mayor que vive solo\",\n  \"edad\": 72\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. CRUD (estilo DRF)",
+      "description": "Crear guarda el id en una variable. Estudiantes necesita un usuario creado y una lista de participante (la crea \"Asignar grupos\").",
+      "item": [
+        {
+          "name": "usuarios: listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "usuarios: crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('usuarioId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nuevo@demo.com\",\n  \"nombre\": \"Nuevo\",\n  \"apellido\": \"Usuario\",\n  \"tipousuario\": \"ESTUDIANTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "usuarios: obtener",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "usuarios: reemplazar (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nuevo@demo.com\",\n  \"nombre\": \"Nuevo\",\n  \"apellido\": \"Usuario\",\n  \"tipousuario\": \"ESTUDIANTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "usuarios: modificar (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nuevo editado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "estudiantes: listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "estudiantes: crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('estudianteId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario_id\": \"{{usuarioId}}\",\n  \"lista_participante_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "estudiantes: obtener",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/{{estudianteId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "{{estudianteId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "estudiantes: reemplazar (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/{{estudianteId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "{{estudianteId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario_id\": \"{{usuarioId}}\",\n  \"lista_participante_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "estudiantes: modificar (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/{{estudianteId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "{{estudianteId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lista_participante_id\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "estudiantes: eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/estudiantes/{{estudianteId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "estudiantes",
+                "{{estudianteId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "usuarios: eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/usuarios/{{usuarioId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "usuarios",
+                "{{usuarioId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "cursos: listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "cursos: crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('cursoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"carrera\": 1,\n  \"tipo_curso\": 1,\n  \"codigo\": \"ARQ101\",\n  \"nombre\": \"Arquitectura de Sistemas\",\n  \"descripcion\": \"Curso demo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "cursos: obtener",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "cursos: reemplazar (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"carrera\": 1,\n  \"tipo_curso\": 1,\n  \"codigo\": \"ARQ101\",\n  \"nombre\": \"Arquitectura de Sistemas\",\n  \"descripcion\": \"Curso demo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "cursos: modificar (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Arquitectura de Sistemas II\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "cursos: eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/cursos/{{cursoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cursos",
+                "{{cursoId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "videos: listar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/videos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "videos",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "videos: crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('videoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/videos/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "videos",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombrevideo\": \"Intro\",\n  \"url\": \"https://example.com/intro.mp4\",\n  \"partida\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "videos: obtener",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/videos/{{videoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "videos",
+                "{{videoId}}",
+                ""
+              ]
+            }
+          }
+        },
+        {
+          "name": "videos: reemplazar (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/videos/{{videoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "videos",
+                "{{videoId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombrevideo\": \"Intro\",\n  \"url\": \"https://example.com/intro.mp4\",\n  \"partida\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "videos: modificar (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/videos/{{videoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "videos",
+                "{{videoId}}",
+                ""
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/intro-v2.mp4\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "videos: eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/videos/{{videoId}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "videos",
+                "{{videoId}}",
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

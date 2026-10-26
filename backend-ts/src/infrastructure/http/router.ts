@@ -1,4 +1,4 @@
-import { DomainError, ForbiddenError, NotFoundError, ValidationError } from '../../domain/errors';
+import { DomainError, ForbiddenError, NotFoundError, UnauthorizedError, ValidationError } from '../../domain/errors';
 import { Handler, HttpRequest, HttpResponse } from './types';
 
 interface Route {
@@ -17,6 +17,7 @@ const corsHeaders = (origin: string): Record<string, string> => ({
 
 export const statusFor = (error: unknown): number => {
   if (error instanceof ValidationError) return 400;
+  if (error instanceof UnauthorizedError) return 401;
   if (error instanceof ForbiddenError) return 403;
   if (error instanceof NotFoundError) return 404;
   if (error instanceof DomainError) return 400;
@@ -27,7 +28,11 @@ export const statusFor = (error: unknown): number => {
 export class Router {
   private readonly routes: Route[] = [];
 
-  constructor(private readonly corsOrigin = '*') {}
+  constructor(
+    private readonly corsOrigin = '*',
+    /** Versión desplegada: viaja en X-App-Version para ver qué versión respondió durante un canario. */
+    private readonly version = 'dev',
+  ) {}
 
   add(method: string, pattern: string, handler: Handler): this {
     this.routes.push({ method, segments: split(pattern), handler });
@@ -39,7 +44,15 @@ export class Router {
     if (request.method === 'OPTIONS') return { status: 204, headers: cors };
 
     const response = await this.dispatch(request);
-    return { ...response, headers: { 'Content-Type': 'application/json', ...cors, ...response.headers } };
+    return {
+      ...response,
+      headers: { 'Content-Type': 'application/json', 'X-App-Version': this.version, ...cors, ...response.headers },
+    };
+  }
+
+  /** Rutas registradas, para GET /api/endpoints: la lista siempre coincide con el código. */
+  list(): { method: string; path: string }[] {
+    return this.routes.map((r) => ({ method: r.method, path: `/api/${r.segments.join('/')}` }));
   }
 
   private async dispatch(request: Omit<HttpRequest, 'params'>): Promise<HttpResponse> {

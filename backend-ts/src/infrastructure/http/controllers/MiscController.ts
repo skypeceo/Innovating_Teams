@@ -4,10 +4,12 @@ import { ListTeams } from '../../../application/use-cases/equipos/ListTeams';
 import { GetTeamImage } from '../../../application/use-cases/soluciones/GetTeamImage';
 import { SaveSolutionImage } from '../../../application/use-cases/soluciones/SaveSolutionImage';
 import { CreateSignedUpload } from '../../../application/use-cases/storage/CreateSignedUpload';
+import { Equipo } from '../../../domain/entities/Equipo';
 import { Handler } from '../types';
 import { fail, ok, positiveInt } from '../responses';
-import { equipoJson, estudianteDetailJson } from '../presenters';
+import { equipoJson, equipoV2Json, estudianteDetailJson } from '../presenters';
 import { Router } from '../router';
+import { canary } from '../canary';
 
 export interface MiscUseCases {
   listTeams: ListTeams;
@@ -20,11 +22,15 @@ export interface MiscUseCases {
 
 /** Equipos, carga masiva de estudiantes, imágenes de solución y URLs firmadas. */
 export class MiscController {
-  constructor(private readonly uc: MiscUseCases) {}
+  constructor(
+    private readonly uc: MiscUseCases,
+    /** % de requests de GET /equipos que atiende la v2 (canario). */
+    private readonly canaryPercent = 0,
+  ) {}
 
   register(router: Router): void {
     router
-      .add('GET', '/equipos', this.listarEquipos)
+      .add('GET', '/equipos', canary(this.listarEquipos(equipoJson), this.listarEquipos(equipoV2Json), this.canaryPercent))
       .add('GET', '/equipos/:equipoId/estudiantes', this.estudiantesPorEquipo)
       .add('POST', '/estudiantes/bulk_create', this.bulkCreate)
       .add('POST', '/guardar-imagen', this.guardarImagen)
@@ -33,13 +39,15 @@ export class MiscController {
       .add('GET', '/storage/signed-url', this.signedUrl);
   }
 
-  private listarEquipos: Handler = async () => {
-    try {
-      return ok((await this.uc.listTeams.execute()).map(equipoJson));
-    } catch (error) {
-      return fail(error);
-    }
-  };
+  private listarEquipos =
+    (present: (e: Equipo) => unknown): Handler =>
+    async () => {
+      try {
+        return ok((await this.uc.listTeams.execute()).map(present));
+      } catch (error) {
+        return fail(error);
+      }
+    };
 
   private estudiantesPorEquipo: Handler = async ({ params }) => {
     try {

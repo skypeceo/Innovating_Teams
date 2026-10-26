@@ -1,0 +1,3 @@
+# Secretos y config local de cada desarrollador
+/.env
+.claude/settings.local.json

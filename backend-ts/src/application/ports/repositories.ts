@@ -81,4 +81,5 @@ export interface VideoRepository extends Repository<Video> {}
 export interface AuthTokenRepository {
   /** Devuelve el token del usuario, creándolo con `key` si no tenía. */
   getOrCreate(usuarioId: number, key: string): Promise<string>;
+  findUsuarioId(key: string): Promise<number | null>;
 }

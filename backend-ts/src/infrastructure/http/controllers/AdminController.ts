@@ -6,6 +6,7 @@ import {
   UpdateDesafio,
 } from '../../../application/use-cases/admin/desafios';
 import { CreatePersona, ListPersonas } from '../../../application/use-cases/admin/personas';
+import { AuthorizeRole } from '../../../application/use-cases/auth/AuthorizeRole';
 import { CreateTema, DeleteTema, GetTema, ListTemas, UpdateTema } from '../../../application/use-cases/admin/temas';
 import { Handler, HttpRequest, HttpResponse } from '../types';
 import { failAdmin, ok, positiveInt } from '../responses';
@@ -13,6 +14,7 @@ import { desafioBaseJson, desafioViewJson, personaJson, temaJson, temaWithCountJ
 import { Router } from '../router';
 
 export interface AdminUseCases {
+  authorize: AuthorizeRole;
   listTemas: ListTemas;
   getTema: GetTema;
   createTema: CreateTema;
@@ -27,19 +29,20 @@ export interface AdminUseCases {
   createPersona: CreatePersona;
 }
 
-/** Envuelve un caso de uso en el formato de respuesta `{ success, data | error }` del módulo admin. */
-const admin =
-  (run: (req: HttpRequest) => Promise<HttpResponse>): Handler =>
-  async (req) => {
-    try {
-      return await run(req);
-    } catch (error) {
-      return failAdmin(error);
-    }
-  };
-
 export class AdminController {
   constructor(private readonly uc: AdminUseCases) {}
+
+  /** Exige token de administrador y envuelve el caso de uso en el formato `{ success, data | error }` del módulo admin. */
+  private admin =
+    (run: (req: HttpRequest) => Promise<HttpResponse>): Handler =>
+    async (req) => {
+      try {
+        await this.uc.authorize.execute(req.headers.authorization, 'ADMINISTRADOR');
+        return await run(req);
+      } catch (error) {
+        return failAdmin(error);
+      }
+    };
 
   register(router: Router): void {
     router
@@ -57,27 +60,27 @@ export class AdminController {
       .add('POST', '/admin/personas', this.crearPersona);
   }
 
-  private listarTemas = admin(async () => ok({ success: true, data: (await this.uc.listTemas.execute()).map(temaWithCountJson) }));
+  private listarTemas = this.admin(async () => ok({ success: true, data: (await this.uc.listTemas.execute()).map(temaWithCountJson) }));
 
-  private crearTema = admin(async ({ body }) =>
+  private crearTema = this.admin(async ({ body }) =>
     ok({ success: true, data: temaWithCountJson(await this.uc.createTema.execute(body)), message: 'Tema creado exitosamente' }, 201));
 
-  private obtenerTema = admin(async ({ params }) =>
+  private obtenerTema = this.admin(async ({ params }) =>
     ok({ success: true, data: temaWithCountJson(await this.uc.getTema.execute(positiveInt(params.id))) }));
 
-  private actualizarTema = admin(async ({ params, body }) =>
+  private actualizarTema = this.admin(async ({ params, body }) =>
     ok({
       success: true,
       data: temaJson(await this.uc.updateTema.execute(positiveInt(params.id), body)),
       message: 'Tema actualizado exitosamente',
     }));
 
-  private eliminarTema = admin(async ({ params }) => {
+  private eliminarTema = this.admin(async ({ params }) => {
     await this.uc.deleteTema.execute(positiveInt(params.id));
     return ok({ success: true, message: 'Tema eliminado exitosamente' });
   });
 
-  private listarDesafios = admin(async ({ query }) => {
+  private listarDesafios = this.admin(async ({ query }) => {
     const r = await this.uc.listDesafios.execute({
       page: query.page,
       limit: query.limit,
@@ -87,27 +90,27 @@ export class AdminController {
     return ok({ success: true, data: { desafios: r.desafios.map(desafioViewJson), pagination: r.pagination } });
   });
 
-  private crearDesafio = admin(async ({ body }) =>
+  private crearDesafio = this.admin(async ({ body }) =>
     ok({ success: true, data: desafioBaseJson(await this.uc.createDesafio.execute(body)), message: 'Desafío creado exitosamente' }, 201));
 
-  private obtenerDesafio = admin(async ({ params }) =>
+  private obtenerDesafio = this.admin(async ({ params }) =>
     ok({ success: true, data: desafioViewJson(await this.uc.getDesafio.execute(positiveInt(params.id))) }));
 
-  private actualizarDesafio = admin(async ({ params, body }) =>
+  private actualizarDesafio = this.admin(async ({ params, body }) =>
     ok({
       success: true,
       data: desafioBaseJson(await this.uc.updateDesafio.execute(positiveInt(params.id), body)),
       message: 'Desafío actualizado exitosamente',
     }));
 
-  private eliminarDesafio = admin(async ({ params }) => {
+  private eliminarDesafio = this.admin(async ({ params }) => {
     await this.uc.deleteDesafio.execute(positiveInt(params.id));
     return ok({ success: true, message: 'Desafío eliminado exitosamente' });
   });
 
-  private listarPersonas = admin(async () =>
+  private listarPersonas = this.admin(async () =>
     ok({ success: true, data: (await this.uc.listPersonas.execute()).map((p) => ({ ...personaJson(p), edad: p.edad || 0 })) }));
 
-  private crearPersona = admin(async ({ body }) =>
+  private crearPersona = this.admin(async ({ body }) =>
     ok({ success: true, data: personaJson(await this.uc.createPersona.execute(body)) }, 201));
 }

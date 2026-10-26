@@ -96,29 +96,43 @@ describe('contrato HTTP con el frontend', () => {
     expect((await call('GET', '/storage/signed-url', {}, { ext: 'png' })).status).toBe(200);
   });
 
+  it('admin exige token de administrador (401 sin token, 403 con otro rol)', async () => {
+    expect((await call('GET', '/admin/temas')).status).toBe(401);
+    expect((await call('GET', '/admin/temas', {}, {}, { authorization: 'Token falso' })).status).toBe(401);
+    const prof = await call('POST', '/login/profesor', { email: 'profesor@demo.com', password: 'profesor-demo-123' });
+    const r = await call('GET', '/admin/temas', {}, {}, { authorization: `Token ${prof.body.token}` });
+    expect(r.status).toBe(403);
+    expect(r.body.success).toBe(false);
+  });
+
   it('CRUD admin de temas y desafíos con paginación y soft delete', async () => {
-    const temas = await call('GET', '/admin/temas');
+    const login = await call('POST', '/login/admin', { email: 'admin@demo.com', password: 'admin-demo-123' });
+    const auth = { authorization: `Token ${login.body.token}` };
+    const admin = (method: string, path: string, body: Record<string, unknown> = {}, query: Record<string, string> = {}) =>
+      call(method, path, body, query, auth);
+
+    const temas = await admin('GET', '/admin/temas');
     expect(temas.body.data[0]).toMatchObject({ nombretema: 'Sostenibilidad Ambiental', total_desafios: 1 });
 
-    const nuevo = await call('POST', '/admin/temas', { nombretema: 'Salud', descripcion: 'Bienestar' });
+    const nuevo = await admin('POST', '/admin/temas', { nombretema: 'Salud', descripcion: 'Bienestar' });
     expect(nuevo.status).toBe(201);
-    expect((await call('POST', '/admin/temas', { nombretema: 'salud', descripcion: 'dup' })).body.error).toBe('Ya existe un tema con ese nombre');
+    expect((await admin('POST', '/admin/temas', { nombretema: 'salud', descripcion: 'dup' })).body.error).toBe('Ya existe un tema con ese nombre');
 
-    const desafios = await call('GET', '/admin/desafios', {}, { page: '1', limit: '5', search: 'residuos' });
+    const desafios = await admin('GET', '/admin/desafios', {}, { page: '1', limit: '5', search: 'residuos' });
     expect(desafios.body.data.pagination).toEqual({ page: 1, limit: 5, total: 1, pages: 1 });
     expect(desafios.body.data.desafios[0]).toMatchObject({ tema_nombre: 'Sostenibilidad Ambiental', persona_nombre: 'Arquetipo 1' });
 
-    const del = await call('DELETE', '/admin/temas/1');
+    const del = await admin('DELETE', '/admin/temas/1');
     expect(del.status).toBe(400);
     expect(del.body.error).toContain('1 desafío(s) activo(s)');
 
-    expect((await call('DELETE', '/admin/desafios/1')).status).toBe(200);
-    expect((await call('DELETE', '/admin/temas/1')).body.success).toBe(true);
-    expect((await call('GET', '/admin/temas/1')).body.data.estado).toBe('INACTIVO');
+    expect((await admin('DELETE', '/admin/desafios/1')).status).toBe(200);
+    expect((await admin('DELETE', '/admin/temas/1')).body.success).toBe(true);
+    expect((await admin('GET', '/admin/temas/1')).body.data.estado).toBe('INACTIVO');
 
-    const personas = await call('GET', '/admin/personas');
+    const personas = await admin('GET', '/admin/personas');
     expect(personas.body.data[0]).toMatchObject({ nombre: 'Arquetipo 1', edad: 67 });
-    expect((await call('POST', '/admin/personas', { nombre: 'X', edad: 'abc' })).status).toBe(400);
+    expect((await admin('POST', '/admin/personas', { nombre: 'X', edad: 'abc' })).status).toBe(400);
   });
 
   it('CRUD estilo DRF para videos y usuarios', async () => {
@@ -142,7 +156,8 @@ describe('contrato HTTP con el frontend', () => {
     expect(bulk.body).toMatchObject({ total: 1, estudiantes: [{ correo: 'b@x.com', apellido: 'Gil Soto', nuevo: true }] });
     expect((await call('POST', '/estudiantes/bulk_create', {})).status).toBe(400);
 
-    expect((await call('GET', '/equipos')).body).toEqual([
+    // X-Canary: false fuerza la versión estable (por defecto el 20% va a la v2)
+    expect((await call('GET', '/equipos', {}, {}, { 'x-canary': 'false' })).body).toEqual([
       { id: 1, nombre: 'Equipo 1', tamanoequipo: 5 },
       { id: 2, nombre: 'Equipo 2', tamanoequipo: 5 },
     ]);
@@ -158,6 +173,13 @@ describe('contrato HTTP con el frontend', () => {
     expect(preflight.headers).toMatchObject({ 'Access-Control-Allow-Origin': '*' });
     expect((await call('GET', '/no-existe')).status).toBe(404);
     expect((await call('GET', '/crear-partida')).status).toBe(405);
+  });
+
+  it('GET /endpoints lista todas las rutas registradas', async () => {
+    const r = await call('GET', '/endpoints');
+    expect(r.body).toContainEqual({ method: 'POST', path: '/api/login' });
+    expect(r.body).toContainEqual({ method: 'GET', path: '/api/partida/:partidaId/estado-actual' });
+    expect(r.body.length).toBeGreaterThan(50);
   });
 
   it('tolera barra final como Django (/login/admin/)', async () => {

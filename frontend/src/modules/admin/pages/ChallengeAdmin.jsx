@@ -20,7 +20,9 @@ const apiRequest = async (endpoint, options = {}) => {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            // El backend exige el token que guarda AdminLogin para las rutas /admin/*
+            'Authorization': `Token ${localStorage.getItem('token')}`
         },
         ...options
     };

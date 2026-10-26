@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Innovating Teams - API serverless (API Gateway + Lambda + DynamoDB) con despliegue canario
+
+Parameters:
+  AppVersion:
+    Type: String
+    Default: '1.0.0'
+    Description: Versión desplegada; cambiarla en cada deploy permite ver en X-App-Version qué versión respondió.
+  CanaryPercent:
+    Type: String
+    Default: '20'
+    Description: Porcentaje de requests de GET /api/equipos que atiende la v2 (canario dentro de la API).
+
+Globals:
+  Api:
+    BinaryMediaTypes:
+      - multipart~1form-data
+
+Resources:
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/            # generado por `npm run build`
+      Handler: lambda.handler
+      Runtime: nodejs22.x
+      MemorySize: 512
+      Timeout: 15
+      # Canario de infraestructura: CodeDeploy manda el 10% del tráfico a la versión nueva durante
+      # 5 minutos y luego el 100%; si la Lambda falla en ese lapso se puede revertir al alias anterior.
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: Canary10Percent5Minutes
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref DataTable
+          APP_VERSION: !Ref AppVersion
+          CANARY_PERCENT: !Ref CanaryPercent
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DataTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /api/{proxy+}
+            Method: ANY
+
+  # NoSQL: una sola tabla, pk = entidad y sk = id (ver src/infrastructure/persistence/DocumentStore.ts).
+  DataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: N
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
+Outputs:
+  ApiUrl:
+    Description: URL base de la API
+    Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/api

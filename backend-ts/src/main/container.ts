@@ -1,5 +1,6 @@
 import { ManageEntity } from '../application/use-cases/crud/ManageEntity';
 import { AuthenticateUser } from '../application/use-cases/auth/AuthenticateUser';
+import { AuthorizeRole } from '../application/use-cases/auth/AuthorizeRole';
 import { StudentEnrollment } from '../application/services/StudentEnrollment';
 import { AssignGroups } from '../application/use-cases/partidas/AssignGroups';
 import { AssignGroupsFromCsv } from '../application/use-cases/partidas/AssignGroupsFromCsv';
@@ -20,24 +21,26 @@ import { CreateDesafio, DeleteDesafio, GetDesafio, ListDesafios, UpdateDesafio }
 import { CreatePersona, ListPersonas } from '../application/use-cases/admin/personas';
 import { CreateTema, DeleteTema, GetTema, ListTemas, UpdateTema } from '../application/use-cases/admin/temas';
 import { FileStorage, PasswordHasher } from '../application/ports/services';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DocumentStore, DynamoStore, MemoryStore } from '../infrastructure/persistence/DocumentStore';
 import {
-  InMemoryAuthTokenRepository,
-  InMemoryConexionPartidaRepository,
-  InMemoryCursoRepository,
-  InMemoryDesafioRepository,
-  InMemoryEquipoRepository,
-  InMemoryEstadoPartidaRepository,
-  InMemoryEstudianteRepository,
-  InMemoryListaParticipanteRepository,
-  InMemoryPartidaRepository,
-  InMemoryPartidaUsuarioRepository,
-  InMemoryPersonaRepository,
-  InMemorySolucionLegoRepository,
-  InMemoryTemaDesafioRepository,
-  InMemoryUsuarioRepository,
-  InMemoryVideoRepository,
-} from '../infrastructure/persistence/in-memory/repositories';
-import { seedDevelopmentData } from '../infrastructure/persistence/in-memory/seed';
+  DocumentAuthTokenRepository,
+  DocumentConexionPartidaRepository,
+  DocumentCursoRepository,
+  DocumentDesafioRepository,
+  DocumentEquipoRepository,
+  DocumentEstadoPartidaRepository,
+  DocumentEstudianteRepository,
+  DocumentListaParticipanteRepository,
+  DocumentPartidaRepository,
+  DocumentPartidaUsuarioRepository,
+  DocumentPersonaRepository,
+  DocumentSolucionLegoRepository,
+  DocumentTemaDesafioRepository,
+  DocumentUsuarioRepository,
+  DocumentVideoRepository,
+} from '../infrastructure/persistence/repositories';
+import { seedDevelopmentData } from '../infrastructure/persistence/seed';
 import { DjangoCompatiblePasswordHasher } from '../infrastructure/security/DjangoCompatiblePasswordHasher';
 import { CryptoRandomizer, CryptoTokenGenerator, SystemClock } from '../infrastructure/security/services';
 import { GcsFileStorage, UnconfiguredFileStorage } from '../infrastructure/storage/GcsFileStorage';
@@ -48,30 +51,43 @@ import { cursoSpec, estudianteSpec, usuarioSpec, videoSpec } from '../infrastruc
 import { MiscController } from '../infrastructure/http/controllers/MiscController';
 import { PartidaController } from '../infrastructure/http/controllers/PartidaController';
 import { Router } from '../infrastructure/http/router';
+import { ok } from '../infrastructure/http/responses';
 
 export type Repositories = ReturnType<typeof createRepositories>;
 
-/**
- * Único punto donde se elige la implementación de persistencia.
- * Para pasar a DynamoDB basta con devolver aquí repositorios Dynamo con las mismas interfaces.
- */
-export const createRepositories = () => ({
-  usuarios: new InMemoryUsuarioRepository(),
-  listas: new InMemoryListaParticipanteRepository(),
-  estudiantes: new InMemoryEstudianteRepository(),
-  partidas: new InMemoryPartidaRepository(),
-  equipos: new InMemoryEquipoRepository(),
-  partidaUsuarios: new InMemoryPartidaUsuarioRepository(),
-  conexiones: new InMemoryConexionPartidaRepository(),
-  estados: new InMemoryEstadoPartidaRepository(),
-  soluciones: new InMemorySolucionLegoRepository(),
-  temas: new InMemoryTemaDesafioRepository(),
-  personas: new InMemoryPersonaRepository(),
-  desafios: new InMemoryDesafioRepository(),
-  cursos: new InMemoryCursoRepository(),
-  videos: new InMemoryVideoRepository(),
-  tokens: new InMemoryAuthTokenRepository(),
+/** Cada repositorio es una colección de documentos (nombre de la entidad) dentro del mismo store. */
+export const createRepositories = (store: DocumentStore) => ({
+  usuarios: new DocumentUsuarioRepository(store, 'usuarios'),
+  listas: new DocumentListaParticipanteRepository(store, 'listas'),
+  estudiantes: new DocumentEstudianteRepository(store, 'estudiantes'),
+  partidas: new DocumentPartidaRepository(store, 'partidas'),
+  equipos: new DocumentEquipoRepository(store, 'equipos'),
+  partidaUsuarios: new DocumentPartidaUsuarioRepository(store, 'partidaUsuarios'),
+  conexiones: new DocumentConexionPartidaRepository(store, 'conexiones'),
+  estados: new DocumentEstadoPartidaRepository(store, 'estados'),
+  soluciones: new DocumentSolucionLegoRepository(store, 'soluciones'),
+  temas: new DocumentTemaDesafioRepository(store, 'temas'),
+  personas: new DocumentPersonaRepository(store, 'personas'),
+  desafios: new DocumentDesafioRepository(store, 'desafios'),
+  cursos: new DocumentCursoRepository(store, 'cursos'),
+  videos: new DocumentVideoRepository(store, 'videos'),
+  tokens: new DocumentAuthTokenRepository(store, 'tokens'),
 });
+
+/**
+ * Único punto donde se elige la persistencia: DynamoDB si hay DYNAMODB_TABLE (en Lambda la define template.yaml),
+ * o memoria para tests y desarrollo. DYNAMODB_ENDPOINT apunta a DynamoDB Local.
+ */
+const createStore = async (env: NodeJS.ProcessEnv): Promise<DocumentStore> => {
+  if (!env.DYNAMODB_TABLE) return new MemoryStore();
+  const endpoint = env.DYNAMODB_ENDPOINT;
+  const client = new DynamoDBClient(
+    endpoint ? { endpoint, region: 'local', credentials: { accessKeyId: 'local', secretAccessKey: 'local' } } : {},
+  );
+  const store = new DynamoStore(env.DYNAMODB_TABLE, client);
+  if (endpoint) await store.ensureTable();
+  return store;
+};
 
 const createFileStorage = (env: NodeJS.ProcessEnv): FileStorage =>
   env.GCS_BUCKET_NAME && env.GCS_CREDENTIALS_FILE
@@ -92,12 +108,12 @@ export interface ContainerOptions {
 
 export const createRouter = async ({
   env = process.env,
-  repositories = createRepositories(),
+  repositories,
   fileStorage = createFileStorage(env),
   hasher = new DjangoCompatiblePasswordHasher(),
   seed = env.SEED_DATA !== 'false',
 }: ContainerOptions = {}): Promise<Router> => {
-  const repos = repositories;
+  const repos = repositories ?? createRepositories(await createStore(env));
   if (seed) await seedDevelopmentData(repos, hasher);
 
   const clock = new SystemClock();
@@ -105,7 +121,7 @@ export const createRouter = async ({
   const enrollment = new StudentEnrollment(repos.usuarios, repos.listas, repos.estudiantes, clock);
   const createPartida = new CreatePartida(repos.partidas, clock, random);
 
-  const router = new Router(env.CORS_ORIGIN ?? '*');
+  const router = new Router(env.CORS_ORIGIN ?? '*', env.APP_VERSION ?? 'dev');
 
   new AuthController(
     new AuthenticateUser(repos.usuarios, repos.tokens, hasher, new CryptoTokenGenerator()),
@@ -130,9 +146,10 @@ export const createRouter = async ({
     saveSolutionImage: new SaveSolutionImage(repos.equipos, repos.soluciones, clock),
     getTeamImage: new GetTeamImage(repos.soluciones),
     createSignedUpload: new CreateSignedUpload(fileStorage, clock, Number(env.GCS_SIGNED_URL_EXPIRATION ?? 3600)),
-  }).register(router);
+  }, Number(env.CANARY_PERCENT ?? 20)).register(router);
 
   new AdminController({
+    authorize: new AuthorizeRole(repos.tokens, repos.usuarios),
     listTemas: new ListTemas(repos.temas, repos.desafios),
     getTema: new GetTema(repos.temas, repos.desafios),
     createTema: new CreateTema(repos.temas, repos.desafios),
@@ -154,6 +171,8 @@ export const createRouter = async ({
   ).register(router, '/estudiantes');
   new CrudController(new ManageEntity(repos.cursos, 'Curso'), cursoSpec).register(router, '/cursos');
   new CrudController(new ManageEntity(repos.videos, 'Video'), videoSpec).register(router, '/videos');
+
+  router.add('GET', '/endpoints', async () => ok(router.list()));
 
   return router;
 };
