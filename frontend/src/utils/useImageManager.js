@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Cache simple para evitar requests duplicados
@@ -52,7 +53,7 @@ const useImageManager = (teamId) => {
       setImageData(prev => ({ ...prev, loading: true, error: null }));
       
       const response = await fetch(
-        `http://localhost:8000/api/obtener-imagen/?team_id=${teamId}`,
+        `${API_URL}/obtener-imagen/?team_id=${teamId}`,
         {
           method: 'GET',
           headers: {

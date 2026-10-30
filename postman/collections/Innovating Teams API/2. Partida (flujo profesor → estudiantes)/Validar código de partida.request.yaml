@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/validar-codigo/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "codigo": "{{codigoPartida}}"
+    }
+order: 2000

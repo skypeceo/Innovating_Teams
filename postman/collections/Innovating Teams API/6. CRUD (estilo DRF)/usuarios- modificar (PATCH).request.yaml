@@ -1,0 +1,13 @@
+$kind: http-request
+name: "usuarios: modificar (PATCH)"
+url: "{{baseUrl}}/usuarios/{{usuarioId}}/"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Nuevo editado"
+    }
+order: 5000

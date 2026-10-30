@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/temas/"
+method: GET
+headers:
+  Authorization: Token {{token}}
+order: 1000

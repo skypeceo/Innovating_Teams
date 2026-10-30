@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/personas/"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Token {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Don Pedro",
+      "imagenurl": "",
+      "contexto": "Adulto mayor que vive solo",
+      "edad": 72
+    }
+order: 13000

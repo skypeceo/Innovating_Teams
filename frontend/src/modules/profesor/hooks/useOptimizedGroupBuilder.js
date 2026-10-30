@@ -1,3 +1,4 @@
+import { API_URL } from '../../../config';
 import { useState, useEffect } from 'react';
 
 export const useOptimizedGroupBuilder = () => {
@@ -19,7 +20,7 @@ export const useOptimizedGroupBuilder = () => {
   const [uploadResult, setUploadResult] = useState(null);
 
   // API Base URL
-  const API_BASE = 'http://127.0.0.1:8000/api/';
+  const API_BASE = `${API_URL}/`;
 
   // Generar código de sala
   const generateRoomCode = () => {

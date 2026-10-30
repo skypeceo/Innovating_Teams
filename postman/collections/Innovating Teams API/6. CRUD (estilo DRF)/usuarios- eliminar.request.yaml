@@ -1,0 +1,5 @@
+$kind: http-request
+name: "usuarios: eliminar"
+url: "{{baseUrl}}/usuarios/{{usuarioId}}/"
+method: DELETE
+order: 12000

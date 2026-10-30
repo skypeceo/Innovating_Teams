@@ -1,0 +1,5 @@
+$kind: http-request
+name: "videos: eliminar"
+url: "{{baseUrl}}/videos/{{videoId}}/"
+method: DELETE
+order: 24000

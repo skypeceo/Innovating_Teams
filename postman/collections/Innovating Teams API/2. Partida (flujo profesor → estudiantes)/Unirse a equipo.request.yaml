@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/unirse-equipo/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "codigo_equipo": "{{codigoEquipo}}",
+      "nombre": "Juan",
+      "apellido": "Pérez",
+      "correo": "juan@demo.com"
+    }
+order: 5000

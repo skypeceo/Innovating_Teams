@@ -1,0 +1,20 @@
+$kind: http-request
+description: En Body > form-data, elegir el archivo postman/lista_ejemplo.csv en "archivo_lista".
+url: "{{baseUrl}}/groups/assign/"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: archivo_lista
+      src: []
+    - type: text
+      key: cantidad_grupos
+      value: "2"
+    - type: text
+      key: tiene_encabezado
+      value: "true"
+    - type: text
+      key: modo
+      value: aleatoria
+order: 9000

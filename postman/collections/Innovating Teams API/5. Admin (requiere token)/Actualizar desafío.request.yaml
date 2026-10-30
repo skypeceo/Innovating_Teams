@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/desafios/{{desafioId}}/"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Token {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "titulo": "Movilidad segura v2",
+      "descripcion": "Cruces peatonales accesibles",
+      "tema_desafio_id": 1,
+      "persona_id": 1
+    }
+order: 10000

@@ -1,3 +1,4 @@
+import { API_URL } from '../../../config';
 import React, { useState } from 'react';
 import './PrototypeUpload.css';
 
@@ -32,7 +33,7 @@ const PrototypeUpload = ({ equipoId = 1, onImageUploaded }) => {
         try {
             const extension = file.name.split('.').pop().toLowerCase();
             const signedUrlResponse = await fetch(
-                `http://localhost:8000/api/signed-url/?grupoId=${equipoId}&ext=${extension}`, 
+                `${API_URL}/signed-url/?grupoId=${equipoId}&ext=${extension}`, 
                 {
                     method: 'GET',
                     headers: {
@@ -62,7 +63,7 @@ const PrototypeUpload = ({ equipoId = 1, onImageUploaded }) => {
 
             setUploadProgress(66);
 
-            const saveResponse = await fetch('http://localhost:8000/api/guardar-imagen/', {
+            const saveResponse = await fetch(`${API_URL}/guardar-imagen/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

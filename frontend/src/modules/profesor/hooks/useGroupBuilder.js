@@ -1,3 +1,4 @@
+import { API_URL } from '../../../config';
 import { useState, useEffect } from 'react';
 
 export const useGroupBuilder = () => {
@@ -35,7 +36,7 @@ export const useGroupBuilder = () => {
     { id: 12, name: 'Sebastián Muñoz', skills: ['técnico', 'organización'], level: 'avanzado' }
   ];
 
-  const API_BASE = 'http://127.0.0.1:8000/api/';
+  const API_BASE = `${API_URL}/`;
 
   useEffect(() => {
     setStudents(exampleStudents);

@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/desafios/"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Token {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "titulo": "Movilidad segura",
+      "descripcion": "Diseña una solución para cruzar la calle",
+      "tema_desafio_id": 1,
+      "persona_id": 1,
+      "nombrepersona": "Arquetipo 1",
+      "edadpersona": 67,
+      "contexto": "Adulto mayor"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('desafioId', pm.response.json().data.id);
+    language: text/javascript
+order: 8000

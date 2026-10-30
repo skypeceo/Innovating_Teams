@@ -1,6 +1,7 @@
+import { API_URL } from '../config';
 // Servicio para manejar la comunicación con el backend de juegos
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api/';
+const API_BASE_URL = `${API_URL}/`;
 
 /**
  * Servicio para la gestión de partidas/juegos

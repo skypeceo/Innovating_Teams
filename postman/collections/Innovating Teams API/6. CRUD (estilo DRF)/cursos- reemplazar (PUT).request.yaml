@@ -1,0 +1,17 @@
+$kind: http-request
+name: "cursos: reemplazar (PUT)"
+url: "{{baseUrl}}/cursos/{{cursoId}}/"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "carrera": 1,
+      "tipo_curso": 1,
+      "codigo": "ARQ101",
+      "nombre": "Arquitectura de Sistemas",
+      "descripcion": "Curso demo"
+    }
+order: 16000

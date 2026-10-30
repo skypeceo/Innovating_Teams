@@ -1,3 +1,4 @@
+import { API_URL } from '../../../config';
 import React, { useState, useEffect, useMemo, useCallback, Suspense, lazy } from 'react';
 import Swal from 'sweetalert2';
 import {
@@ -13,7 +14,7 @@ import {
 } from 'react-icons/fa';
 import { BsPersonSquare } from 'react-icons/bs';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = API_URL;
 const ITEMS_PER_PAGE = 5;
 
 const apiRequest = async (endpoint, options = {}) => {

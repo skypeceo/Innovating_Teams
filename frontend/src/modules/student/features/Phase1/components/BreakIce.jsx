@@ -1,8 +1,9 @@
+import { API_URL } from '../../../../../config';
 import React, { useEffect, useState } from "react";
 import Timer from '../../../../../components/Timer';
 
 const EQUIPO_ID_TEST = 1;
-const API_URL = `http://127.0.0.1:8000/api/equipos/${EQUIPO_ID_TEST}/estudiantes/`;
+const ESTUDIANTES_URL = `${API_URL}/equipos/${EQUIPO_ID_TEST}/estudiantes/`;
 
 function BreakIce({ onComplete }) {
   const [alumnos, setAlumnos] = useState([]);
@@ -13,7 +14,7 @@ function BreakIce({ onComplete }) {
     const fetchAlumnos = async () => {
       try {
         setLoading(true);
-        const response = await fetch(API_URL);
+        const response = await fetch(ESTUDIANTES_URL);
 
         if (!response.ok) {
           throw new Error(`Error HTTP ${response.status}`);

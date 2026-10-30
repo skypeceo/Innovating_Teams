@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/storage/signed-url/?grupoId=1&ext=png"
+method: GET
+queryParams:
+  grupoId: "1"
+  ext: png
+order: 4000

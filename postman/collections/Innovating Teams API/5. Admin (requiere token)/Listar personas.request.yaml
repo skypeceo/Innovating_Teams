@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/personas/"
+method: GET
+headers:
+  Authorization: Token {{token}}
+order: 12000

@@ -1,0 +1,3 @@
+$kind: collection
+description: Lista de endpoints generada desde el router.
+order: 1000

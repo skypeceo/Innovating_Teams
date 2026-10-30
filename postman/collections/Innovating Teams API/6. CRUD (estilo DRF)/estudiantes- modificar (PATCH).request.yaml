@@ -1,0 +1,13 @@
+$kind: http-request
+name: "estudiantes: modificar (PATCH)"
+url: "{{baseUrl}}/estudiantes/{{estudianteId}}/"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "lista_participante_id": 1
+    }
+order: 10000

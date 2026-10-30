@@ -1,0 +1,14 @@
+$kind: http-request
+name: "estudiantes: reemplazar (PUT)"
+url: "{{baseUrl}}/estudiantes/{{estudianteId}}/"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "usuario_id": "{{usuarioId}}",
+      "lista_participante_id": 1
+    }
+order: 9000

@@ -1,0 +1,20 @@
+$kind: http-request
+name: "usuarios: crear"
+url: "{{baseUrl}}/usuarios/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "nuevo@demo.com",
+      "nombre": "Nuevo",
+      "apellido": "Usuario",
+      "tipousuario": "ESTUDIANTE"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('usuarioId', pm.response.json().id);
+    language: text/javascript
+order: 2000

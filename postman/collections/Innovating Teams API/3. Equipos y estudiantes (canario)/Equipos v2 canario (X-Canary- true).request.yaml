@@ -1,0 +1,7 @@
+$kind: http-request
+name: "Equipos v2 canario (X-Canary: true)"
+url: "{{baseUrl}}/equipos/"
+method: GET
+headers:
+  X-Canary: "true"
+order: 3000

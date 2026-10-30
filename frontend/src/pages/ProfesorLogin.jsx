@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showErrorAlert, showSuccessAlert } from "../utils/sweetAlerts"; // Importa las funciones
@@ -13,7 +14,7 @@ export default function ProfesorLogin() {
 
     try {
       // Endpoint específico para profesores
-      const url = "http://localhost:8000/api/login/profesor/";
+      const url = `${API_URL}/login/profesor/`;
 
       const res = await fetch(url, {
         method: "POST",

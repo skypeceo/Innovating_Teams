@@ -1,3 +1,4 @@
+import { API_URL } from '../../../../config';
 // src/modules/student/features/Phase-1/index.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -30,7 +31,7 @@ export default function PhaseSalaEspera({ onStart, isProf }) {
     const cargarGrupos = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/partida/${partidaId}/obtener-grupos/`
+          `${API_URL}/partida/${partidaId}/obtener-grupos/`
         );
         
         if (response.data && response.data.grupos) {
@@ -60,7 +61,7 @@ export default function PhaseSalaEspera({ onStart, isProf }) {
     const checkEstadoPartida = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/partida/${partidaId}/estado-actual/`
+          `${API_URL}/partida/${partidaId}/estado-actual/`
         );
         
         // Si el estado es INICIADA o fase >= 1, iniciar el juego (ir a fase 0 = video)

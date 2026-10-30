@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{baseUrl}}/partida/{{partidaId}}/asignar-grupos/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "grupos": [
+        {
+          "nombre": "Los Pioneros",
+          "alumnos": [
+            {
+              "id_correo_usuario": "ana@demo.com",
+              "primer_nombre": "Ana",
+              "apellido_paterno": "Paz",
+              "apellido_materno": "Rey"
+            }
+          ]
+        }
+      ]
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('codigoEquipo', pm.response.json().grupos_creados[0].codigo_equipo);
+    language: text/javascript
+order: 3000

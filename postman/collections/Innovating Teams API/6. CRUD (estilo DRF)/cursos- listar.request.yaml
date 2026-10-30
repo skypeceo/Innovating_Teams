@@ -1,0 +1,5 @@
+$kind: http-request
+name: "cursos: listar"
+url: "{{baseUrl}}/cursos/"
+method: GET
+order: 13000

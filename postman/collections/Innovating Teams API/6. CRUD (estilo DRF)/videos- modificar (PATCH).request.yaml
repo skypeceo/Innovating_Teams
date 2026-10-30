@@ -1,0 +1,13 @@
+$kind: http-request
+name: "videos: modificar (PATCH)"
+url: "{{baseUrl}}/videos/{{videoId}}/"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "url": "https://example.com/intro-v2.mp4"
+    }
+order: 23000

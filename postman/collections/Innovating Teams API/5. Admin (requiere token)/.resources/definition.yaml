@@ -1,0 +1,3 @@
+$kind: collection
+description: Ejecutar antes "1. Auth > Login admin". Sin token responde 401; con token de profesor, 403.
+order: 6000

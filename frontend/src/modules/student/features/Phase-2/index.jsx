@@ -1,3 +1,4 @@
+import { API_URL } from '../../../../config';
 // src/modules/student/features/Phase-2/index.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
@@ -27,7 +28,7 @@ export default function PhaseSalaCodigo({ onJoin }) {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:8000/api/validar-equipo/', {
+      const response = await axios.post(`${API_URL}/validar-equipo/`, {
         codigo: code.trim()
       });
 

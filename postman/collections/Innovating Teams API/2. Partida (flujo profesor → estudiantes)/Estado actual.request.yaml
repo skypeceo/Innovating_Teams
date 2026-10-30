@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/partida/{{partidaId}}/estado-actual/"
+method: GET
+order: 8000

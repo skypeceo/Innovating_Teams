@@ -1,0 +1,3 @@
+$kind: collection
+description: signed-url requiere GCS_BUCKET_NAME y GCS_CREDENTIALS_FILE; sin ellos responde 500 con el motivo.
+order: 5000

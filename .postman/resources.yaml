@@ -1,0 +1,11 @@
+# Use this workspace to collaborate
+workspace:
+  id: 8c1f98b8-2e29-4969-8b97-4709b571cf2d
+
+localResources:
+  collections:
+    - ../backend-ts/postman/InnovatingTeams.postman_collection.json
+
+cloudResources:
+  collections:
+    ../postman/collections/Innovating Teams API: ba7d67fa-dedf-42dc-a17f-96850d8a60b7

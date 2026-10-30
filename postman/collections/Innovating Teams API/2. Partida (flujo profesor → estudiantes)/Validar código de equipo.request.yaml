@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/validar-equipo/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "codigo": "{{codigoEquipo}}"
+    }
+order: 4000

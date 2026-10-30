@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/temas/{{temaId}}/"
+method: DELETE
+headers:
+  Authorization: Token {{token}}
+order: 6000

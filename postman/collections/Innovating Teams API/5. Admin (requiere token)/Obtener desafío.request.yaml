@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/desafios/{{desafioId}}/"
+method: GET
+headers:
+  Authorization: Token {{token}}
+order: 9000

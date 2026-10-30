@@ -26,19 +26,19 @@ Resources:
       Runtime: nodejs22.x
       MemorySize: 512
       Timeout: 15
-      # Canario de infraestructura: CodeDeploy manda el 10% del tráfico a la versión nueva durante
-      # 5 minutos y luego el 100%; si la Lambda falla en ese lapso se puede revertir al alias anterior.
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/LabRole
       AutoPublishAlias: live
+      AutoPublishAliasAllProperties: true
       DeploymentPreference:
         Type: Canary10Percent5Minutes
+        Role: !Sub arn:aws:iam::${AWS::AccountId}:role/LabRole
       Environment:
         Variables:
           DYNAMODB_TABLE: !Ref DataTable
           APP_VERSION: !Ref AppVersion
           CANARY_PERCENT: !Ref CanaryPercent
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref DataTable
+          S3_BUCKET: !Ref FrontendBucket
+          PUBLIC_BASE_URL: !Sub https://${FrontendBucket.RegionalDomainName}
       Events:
         Api:
           Type: Api
@@ -62,7 +62,40 @@ Resources:
         - AttributeName: sk
           KeyType: RANGE
 
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [GET, PUT]
+            AllowedOrigins: ['*']
+            AllowedHeaders: ['*']
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub ${FrontendBucket.Arn}/*
+
 Outputs:
   ApiUrl:
     Description: URL base de la API
     Value: !Sub https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/api
+  FrontendUrl:
+    Description: URL del frontend (sitio web S3)
+    Value: !GetAtt FrontendBucket.WebsiteURL
+  FrontendBucketName:
+    Value: !Ref FrontendBucket

@@ -1,0 +1,21 @@
+$kind: http-request
+name: "cursos: crear"
+url: "{{baseUrl}}/cursos/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "carrera": 1,
+      "tipo_curso": 1,
+      "codigo": "ARQ101",
+      "nombre": "Arquitectura de Sistemas",
+      "descripcion": "Curso demo"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('cursoId', pm.response.json().id);
+    language: text/javascript
+order: 14000

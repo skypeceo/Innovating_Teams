@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/desafios/{{desafioId}}/"
+method: DELETE
+headers:
+  Authorization: Token {{token}}
+order: 11000

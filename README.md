@@ -8,8 +8,10 @@ entran con un código de equipo y avanzan por fases (rompehielos, empatía, prot
 Arquitectura
 ------------
 ```
-React (frontend/)  ──HTTP──▶  API Gateway  ──▶  AWS Lambda (backend-ts/)  ──▶  DynamoDB (NoSQL, 1 tabla)
-                                                  └─ local: Express en :8000 con el mismo código
+S3 sitio web ─▶ React (frontend/)
+React  ──HTTPS──▶  API Gateway  ──▶  AWS Lambda (backend-ts/)  ──▶  DynamoDB (NoSQL, 1 tabla)
+                                       ├─ firma subidas de fotos a S3
+                                       └─ local: Express en :8000 con el mismo código
 ```
 - **Serverless:** el backend corre como una sola Lambda detrás de API Gateway (`backend-ts/template.yaml`, AWS SAM).
   En local se usa el mismo router con Express (`npm run dev`).
@@ -26,7 +28,8 @@ Estructura
 ----------
 - `backend-ts/` – API en TypeScript (reemplaza al antiguo backend Django).
 - `backend-ts/postman/` – colección Postman con los 56 endpoints y un CSV de ejemplo.
-- `frontend/` – React 18 + Tailwind (módulos `student`, `profesor`, `admin`). Llama a `http://localhost:8000/api`.
+- `frontend/` – React 18 + Tailwind (módulos `student`, `profesor`, `admin`). La URL de la API está en `src/config.js`
+  (`REACT_APP_API_URL`; por defecto `http://localhost:8000/api`).
 
 Correr en local
 ---------------
@@ -66,13 +69,25 @@ curl -i localhost:8000/api/equipos -H "X-Canary: true"
 
 Desplegar en AWS
 ----------------
+Pensado para **AWS Academy Learner Lab** (`us-east-1`, la Lambda y CodeDeploy usan `LabRole`). Requisitos: AWS CLI v2
+y las credenciales de *AWS Details → AWS CLI* en `~/.aws/credentials` (cambian en cada sesión del lab).
+
+`template.yaml` crea todo: API Gateway + Lambda (canario 10% / 5 min) + DynamoDB + S3 (sitio web del frontend y fotos).
+El Learner Lab no permite CloudFront, así que el frontend queda en HTTP (la cámara del navegador exige HTTPS; la foto se
+puede subir desde archivo).
 ```
 cd backend-ts
-npm run build                     # dist/lambda.js
-sam deploy --guided               # crea API Gateway + Lambda + DynamoDB
-sam deploy --parameter-overrides AppVersion=1.1.0   # segundo deploy: arranca el canario 10% / 5 min
+npm run build
+aws s3 mb s3://innovating-artifacts-<cuenta>      # solo la primera vez
+aws cloudformation package --template-file template.yaml --s3-bucket innovating-artifacts-<cuenta> --output-template-file packaged.yaml
+aws cloudformation deploy --template-file packaged.yaml --stack-name innovating-teams --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
+aws cloudformation describe-stacks --stack-name innovating-teams --query "Stacks[0].Outputs"   # ApiUrl, FrontendUrl, ...
 ```
-En **AWS Academy Learner Lab** no se pueden crear roles: agregar `Role: !Sub arn:aws:iam::${AWS::AccountId}:role/LabRole`
-a la función y `Role:` con el mismo ARN dentro de `DeploymentPreference` en `template.yaml`.
-
-Tras desplegar, el frontend debe apuntar a la URL de salida `ApiUrl` en vez de `http://localhost:8000/api`.
+Frontend (`frontend/.env.production` tiene `REACT_APP_API_URL` = `ApiUrl`):
+```
+cd frontend
+npm run build
+aws s3 sync build/ s3://<FrontendBucketName> --delete --exclude "soluciones/*"
+```
+Canario de infraestructura: volver a desplegar con `--parameter-overrides AppVersion=1.1.0`; durante 5 minutos el 10% de
+las requests responde con `X-App-Version: 1.1.0` (se ve en CodeDeploy y con `curl -i`).

@@ -1,0 +1,13 @@
+$kind: http-request
+name: "cursos: modificar (PATCH)"
+url: "{{baseUrl}}/cursos/{{cursoId}}/"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Arquitectura de Sistemas II"
+    }
+order: 17000

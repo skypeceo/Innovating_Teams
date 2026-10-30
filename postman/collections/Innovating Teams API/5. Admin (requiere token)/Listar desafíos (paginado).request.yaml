@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/desafios/?page=1&limit=10&search="
+method: GET
+headers:
+  Authorization: Token {{token}}
+queryParams:
+  page: "1"
+  limit: "10"
+  search: ""
+order: 7000

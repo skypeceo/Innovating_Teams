@@ -1,0 +1,19 @@
+$kind: http-request
+name: "videos: crear"
+url: "{{baseUrl}}/videos/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombrevideo": "Intro",
+      "url": "https://example.com/intro.mp4",
+      "partida": null
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('videoId', pm.response.json().id);
+    language: text/javascript
+order: 20000

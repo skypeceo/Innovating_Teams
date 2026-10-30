@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/crear-partida/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "max_equipos": 2,
+      "max_participantes": 20
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('partidaId', pm.response.json().id); pm.collectionVariables.set('codigoPartida', pm.response.json().codigoAcceso);
+    language: text/javascript
+order: 1000

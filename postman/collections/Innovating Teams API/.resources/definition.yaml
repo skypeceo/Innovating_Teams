@@ -1,0 +1,14 @@
+$kind: collection
+description: Todos los endpoints del backend-ts. Levantar con `npm run dev` (http://localhost:8000/api) o cambiar {{baseUrl}} por la URL de API Gateway.
+variables:
+  baseUrl: http://localhost:8000/api
+  token: ""
+  partidaId: "1"
+  codigoPartida: "123456"
+  codigoEquipo: "1234561"
+  temaId: "1"
+  desafioId: "1"
+  usuarioId: "1"
+  estudianteId: "1"
+  cursoId: "1"
+  videoId: "1"

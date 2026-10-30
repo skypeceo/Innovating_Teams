@@ -1,0 +1,15 @@
+$kind: http-request
+name: "videos: reemplazar (PUT)"
+url: "{{baseUrl}}/videos/{{videoId}}/"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombrevideo": "Intro",
+      "url": "https://example.com/intro.mp4",
+      "partida": null
+    }
+order: 22000

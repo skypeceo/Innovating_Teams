@@ -44,6 +44,7 @@ import { seedDevelopmentData } from '../infrastructure/persistence/seed';
 import { DjangoCompatiblePasswordHasher } from '../infrastructure/security/DjangoCompatiblePasswordHasher';
 import { CryptoRandomizer, CryptoTokenGenerator, SystemClock } from '../infrastructure/security/services';
 import { GcsFileStorage, UnconfiguredFileStorage } from '../infrastructure/storage/GcsFileStorage';
+import { S3FileStorage } from '../infrastructure/storage/S3FileStorage';
 import { AdminController } from '../infrastructure/http/controllers/AdminController';
 import { AuthController } from '../infrastructure/http/controllers/AuthController';
 import { CrudController } from '../infrastructure/http/controllers/CrudController';
@@ -90,7 +91,9 @@ const createStore = async (env: NodeJS.ProcessEnv): Promise<DocumentStore> => {
 };
 
 const createFileStorage = (env: NodeJS.ProcessEnv): FileStorage =>
-  env.GCS_BUCKET_NAME && env.GCS_CREDENTIALS_FILE
+  env.S3_BUCKET
+    ? new S3FileStorage({ bucketName: env.S3_BUCKET, publicBaseUrl: env.PUBLIC_BASE_URL ?? '' })
+    : env.GCS_BUCKET_NAME && env.GCS_CREDENTIALS_FILE
     ? new GcsFileStorage({
         bucketName: env.GCS_BUCKET_NAME,
         credentialsFile: env.GCS_CREDENTIALS_FILE,

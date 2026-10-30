@@ -1,0 +1,3 @@
+$kind: collection
+description: Login. "Login admin" guarda el token en {{token}} para la carpeta Admin.
+order: 2000

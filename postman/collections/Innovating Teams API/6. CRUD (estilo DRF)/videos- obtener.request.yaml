@@ -1,0 +1,5 @@
+$kind: http-request
+name: "videos: obtener"
+url: "{{baseUrl}}/videos/{{videoId}}/"
+method: GET
+order: 21000

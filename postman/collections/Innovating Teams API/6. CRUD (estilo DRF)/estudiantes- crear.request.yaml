@@ -1,0 +1,18 @@
+$kind: http-request
+name: "estudiantes: crear"
+url: "{{baseUrl}}/estudiantes/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "usuario_id": "{{usuarioId}}",
+      "lista_participante_id": 1
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('estudianteId', pm.response.json().id);
+    language: text/javascript
+order: 7000

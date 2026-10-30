@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/guardar-imagen/"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "equipo_id": 1,
+      "image_url": "https://storage.googleapis.com/demo/equipo1.png",
+      "descripcion": "Prototipo LEGO"
+    }
+order: 1000

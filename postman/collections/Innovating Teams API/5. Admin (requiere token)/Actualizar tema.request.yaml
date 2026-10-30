@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/temas/{{temaId}}/"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Token {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "nombretema": "Salud y bienestar",
+      "descripcion": "Bienestar físico y mental"
+    }
+order: 5000

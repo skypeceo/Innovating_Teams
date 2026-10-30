@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/temas/"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Token {{token}}
+body:
+  type: json
+  content: |-
+    {
+      "nombretema": "Salud",
+      "descripcion": "Bienestar en la comunidad"
+    }
+scripts:
+  - type: afterResponse
+    code: pm.collectionVariables.set('temaId', pm.response.json().data.id);
+    language: text/javascript
+order: 3000

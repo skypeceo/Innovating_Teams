@@ -1,0 +1,3 @@
+$kind: collection
+description: "GET /equipos tiene canario: X-Canary fuerza la versión y la respuesta indica cuál atendió en el header X-Version."
+order: 4000
